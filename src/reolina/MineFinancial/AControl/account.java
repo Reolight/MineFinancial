@@ -9,6 +9,7 @@ public class account implements IBalance{
     protected BigDecimal balance;
     public Type OwnerType;
     static protected Connection connection;
+
     void DisplayBalance() {} //displaying curr balance
 
     //static protected boolean UpdateBalance(String name) {return false; }
@@ -24,6 +25,11 @@ public class account implements IBalance{
     public account(BigDecimal _balance)
     {
         balance = _balance;
+    }
+
+    @Override
+    public String getName() {
+        return null;
     }
 
     public int ChangeBalance(BigDecimal delta) {

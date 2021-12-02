@@ -44,7 +44,9 @@ public class ABank extends account implements IBalance{ //def for bank(?)
             return false;
         }
     }
-
+    @Override public String getName(){
+        return "bank";
+    }
     @Override
     public int ChangeBalance(BigDecimal delta) {
         if (balance.subtract(delta).compareTo(_zero) < 0)
