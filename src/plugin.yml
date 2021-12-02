@@ -1,0 +1,35 @@
+name: MineFinancial
+main: reolina.MineFinancial.main.MineFinancial
+version: 0.1.0
+authors: [Reolight, Eva]
+commands:
+  bank:
+    description: Info about bank
+    usage:
+      /<command> balance - check the balance
+      /<command> emission (value) - emit new amount of money
+    aliases: [банк]
+  player:
+    description: Player financial role promotion
+    usage:
+      /<command> balance - check player balance
+      /<command> finrole - check player FRole
+    aliases: [игрок]
+  finrole:
+    description: Promoting player role in finance system
+    usage:
+      /<command> [promote|demote] [player] - promotion/demotion
+    aliases: [финроль]
+  clan:
+    description: for clan management
+    usage:
+      /<command> list - список кланов
+      /<command> balance - проверка баланса клана
+      /<command> join (ClanName) - примоединение к клану (или запрос)
+      /<command> leave - leave current clan
+      /<command> explell (Player) - expell player (leader only)
+      /<command> invite (Player) - inviting player in clan (leader only)
+
+      /<command> [get|set] leader (clan) - get/set leader name of current player clan (or indicated in clauses)
+      /<command> [promote|demote] player - promote or demote player
+      /<command> message <message> - clan chat;
