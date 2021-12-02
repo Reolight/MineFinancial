@@ -1,5 +1,6 @@
 package reolina.MineFinancial.AControl;
 
+import com.mysql.fabric.xmlrpc.base.Array;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import reolina.MineFinancial.QueryMasterConstructor.Field;
@@ -11,8 +12,7 @@ import reolina.MineFinancial.definition.Type;
 
 import java.sql.ResultSet;
 import java.math.BigDecimal;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class AClan extends account implements IBalance {
@@ -95,6 +95,9 @@ public class AClan extends account implements IBalance {
         } else return 2;
     }
 
+    @Override public String getName() {
+        return Name;
+    }
     @Override public int ChangeBalance(BigDecimal delta) {
         if (balance.subtract(delta).compareTo(_zero) < 0)
             return 100;
@@ -187,6 +190,13 @@ public class AClan extends account implements IBalance {
 
     public void SendClanMessage(String Message){
         for (String s : membersRole.keySet()){
+            Bukkit.getPlayer(s).sendMessage(Message);
+        }
+    }
+    public void SendClanMessageExept(String Message, String[] Except){
+        List<String> NamesExcept = Arrays.asList(Except);
+        for (String s : membersRole.keySet()){
+            if (NamesExcept.contains(s)) continue;
             Bukkit.getPlayer(s).sendMessage(Message);
         }
     }

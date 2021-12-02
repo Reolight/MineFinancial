@@ -153,7 +153,7 @@ public class QueryMaster {
         }
     }
 
-    static public boolean Insert(String tableName, rec[] records, rec where) {
+    static public boolean Insert(String tableName, rec[] records, @Nullable  rec where) {
         QueryMaster insert = new QueryMaster(QueryType.INSERT, tableName);
         //Table tab = tables.get(tableName);
         for (rec r : records){

@@ -20,6 +20,6 @@ public class AControl {
     {
         Bank = ABank.getInstance();
         APlayer.init();
-
+        AClan.init();
     }
 }

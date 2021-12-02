@@ -43,21 +43,22 @@ public class APlayer extends account implements IBalance{
         }
         return 0;
     }
-    @Override
-    public int ChangeBalance(BigDecimal delta) {
+
+    @Override public String getName() {
+        return Name;
+    }
+    @Override public int ChangeBalance(BigDecimal delta) {
         if (balance.subtract(delta).compareTo(_zero) < 0)
             return 100;
         balance = balance.subtract(delta);
         return UpdateBalance(this);
     }
-    @Override
-    public int SubsBalance(BigDecimal delta) {
+    @Override public int SubsBalance(BigDecimal delta) {
         delta = _zero.subtract(delta);
         int res = ChangeBalance(delta);
         return res;
     }
-    @Override
-    public int AddBalance(BigDecimal delta) {
+    @Override public int AddBalance(BigDecimal delta) {
         return ChangeBalance(delta);
     }
 

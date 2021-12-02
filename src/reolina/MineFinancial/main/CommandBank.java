@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerChatEvent;
 import reolina.MineFinancial.AControl.ABank;
+import reolina.MineFinancial.AControl.APlayer;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -27,21 +28,22 @@ public class CommandBank implements CommandExecutor {
     {
         ABank Bank = ABank.getInstance();
         switch (args[0].toLowerCase(Locale.ROOT)){
+            case "balance":
             case "баланс":
                 sender.sendMessage(ChatColor.YELLOW+"Текущий баланс банка: "+ChatColor.AQUA+"¥"+Bank.GetBalance());
-                return true;
-            case "balance":
-                sender.sendMessage(ChatColor.YELLOW+"Current bank balance: "+ChatColor.AQUA+"¥"+Bank.GetBalance());
                 return true;
 
             case "эмиссия":
             case "emission":
-                try {
-                    if (Bank.MoneyEmission(new BigDecimal(args[1]))) {
-                        sender.sendMessage();
-                    };
-                }
-                catch (SQLException ex) {sender.sendMessage(ChatColor.RED+ex.toString()); }
+                if (APlayer.list.get(sender.getName()).frole.ordinal()<4)
+                    sender.sendMessage("У вас недостаточно прав для выполнения данного запроса");
+
+                    try {
+                        if (Bank.MoneyEmission(new BigDecimal(args[1]))) {
+                            sender.sendMessage(ChatColor.GOLD+"В банк зачислено "+ChatColor.AQUA+"¥"+args[1]);
+                        };
+                    }
+                    catch (SQLException ex) {sender.sendMessage(ChatColor.RED+ex.toString()); }
                 return true;
             default:
                 sender.sendMessage("Unknown command "+args[0]);

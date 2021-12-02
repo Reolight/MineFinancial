@@ -33,3 +33,8 @@ commands:
       /<command> [get|set] leader (clan) - get/set leader name of current player clan (or indicated in clauses)
       /<command> [promote|demote] player - promote or demote player
       /<command> message <message> - clan chat;
+  transaction:
+    description: for payments
+      aliases: [pay|оплатить|заплатить]
+      usage:
+        /<command> to (name) [clan|player|bank] (amount)

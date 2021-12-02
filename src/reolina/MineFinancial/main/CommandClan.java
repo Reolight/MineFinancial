@@ -8,6 +8,8 @@ import reolina.MineFinancial.AControl.AClan;
 import reolina.MineFinancial.AControl.APlayer;
 import reolina.MineFinancial.definition.CRole;
 
+import java.util.ArrayList;
+
 public class CommandClan implements CommandExecutor {
     private MineFinancial plugin;
     public CommandClan(MineFinancial plugin)
@@ -72,7 +74,14 @@ public class CommandClan implements CommandExecutor {
                                 ChatColor.RED+". Для присоединения к новому клану покиньте текущий.");
                         return true;
                     }
-
+                    //Здесь должен создаться запрос, но пока принимаем автоматом
+                    AClan applying = AClan.clans.get(args[1]);
+                    if (applying != null){
+                        applying.AddMember(sender.getName());
+                        sender.sendMessage(ChatColor.GREEN+"Вы присоединились к клану "+ChatColor.LIGHT_PURPLE+ applying.Name);
+                        applying.SendClanMessageExept("Игрок "+ChatColor.AQUA+" присоединился к клану",
+                                new String[]{sender.getName()});
+                    }
             }
         }
         return false;
