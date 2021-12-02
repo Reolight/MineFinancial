@@ -18,6 +18,7 @@ public class CommandClan implements CommandExecutor {
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
+        if (args == null) return false;
         AClan acl = AClan.clans.get(AClan.SearchPlayer(sender.getName()));
         CRole cr = acl != null ? acl.membersRole.get(sender.getName()) : null;
         if (args.length == 1){
@@ -82,6 +83,14 @@ public class CommandClan implements CommandExecutor {
                         applying.SendClanMessageExept("Игрок "+ChatColor.AQUA+" присоединился к клану",
                                 new String[]{sender.getName()});
                     }
+                case "создать":
+                case "create":
+                    int resc = AClan.CreateClan(args[1], sender.getName());
+                    if (resc == 0) sender.sendMessage(ChatColor.YELLOW+"Клан "+ChatColor.LIGHT_PURPLE+args[1]+ChatColor.YELLOW+" создан!");
+                    if (resc == 102) sender.sendMessage(ChatColor.RED+"Клан "+ChatColor.LIGHT_PURPLE+args[1]+ChatColor.RED+" уже существует");
+                    if (resc == 403) sender.sendMessage(ChatColor.RED+"Вы уже состоите в другом клане ("
+                            +ChatColor.LIGHT_PURPLE+ AClan.SearchPlayer(sender.getName())+ChatColor.RED+")");
+                    return true;
             }
         }
         return false;

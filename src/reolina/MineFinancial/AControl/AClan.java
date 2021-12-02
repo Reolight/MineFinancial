@@ -176,7 +176,7 @@ public class AClan extends account implements IBalance {
     static public int CreateClan(String clanName, String sender){
         var listOfClans = clans.values();
         if (listOfClans.contains(clanName))
-            return 1;
+            return 102;
         else{
             if (SearchPlayer(sender) == null) {
                 clans.put(clanName, new AClan(clanName,new BigDecimal(0), sender,
@@ -184,7 +184,7 @@ public class AClan extends account implements IBalance {
                         new String[] {CRole.leader.toString()}));
                 APlayer.list.get(sender).ChangeClan(clanName);
                 return 0;
-            } else return 2;
+            } else return 403;
         }
     }
 
