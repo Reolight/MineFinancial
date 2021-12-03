@@ -2,10 +2,12 @@ package reolina.MineFinancial.AControl;
 
 import com.mysql.fabric.xmlrpc.base.Array;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.libs.jline.internal.Log;
 import org.bukkit.entity.Player;
 import reolina.MineFinancial.QueryMasterConstructor.Field;
 import reolina.MineFinancial.QueryMasterConstructor.QueryMaster;
 import reolina.MineFinancial.QueryMasterConstructor.SQLtype;
+import reolina.MineFinancial.QueryMasterConstructor.rec;
 import reolina.MineFinancial.definition.CRole;
 import reolina.MineFinancial.definition.FRole;
 import reolina.MineFinancial.definition.Type;
@@ -28,24 +30,27 @@ public class AClan extends account implements IBalance {
     static private CRole[] cr = CRole.values();
     static private String[] RebuildStringsMemCR(Map<String, CRole> mems){
             //метод лепит всех игроков и их роли в две строки, удобные для ввода в БД
+        Log.debug("<[RebuildStringMemCR]>");
         StringBuilder perUpdateV = new StringBuilder("");
         StringBuilder perUpdateM = new StringBuilder("");
-        var coll = mems.values();
-        var mem = mems.keySet();
-        for (var c : coll)
+        var cRoles = mems.values();
+        var members = mems.keySet();
+        for (var c : cRoles)
             if (perUpdateV.length()<1)
                 perUpdateV.append(c);
             else
                 perUpdateV.append(" "+c);
-        for (var m : mem)
+        for (var m : members)
             if (perUpdateM.length()<1)
                 perUpdateM.append(m);
             else
                 perUpdateM.append(" "+m);
+        Log.debug("3: "+perUpdateM+"|4: "+perUpdateV);
+        Log.debug(">[RebuildStringMemCR]<");
         return new String[] {perUpdateM.toString(/*column 3*/), perUpdateV.toString(/*column 4*/)};
     }
-    static private void UpdateMembers(String clanName, Map<String, CRole> mems){
-        String[] strings = RebuildStringsMemCR(mems);
+    static private void UpdateMembers(String clanName){
+        String[] strings = RebuildStringsMemCR(clans.get(clanName).membersRole);
         QueryMaster upd = new QueryMaster(QueryMaster.QueryType.UPDATE, table);
         upd.AddValue(columnNames[3], strings[0].toString(), true);
         upd.AddValue(columnNames[4], strings[1], true);
@@ -74,7 +79,7 @@ public class AClan extends account implements IBalance {
         upd.AddWhere(columnNames[0]+" = \""+clanName+"\"");
         try{upd.Execute(); }
         catch (Exception ex) {log.severe("Something SEVERE on renaming clan in DB:\n"+ex.toString()+"\n"+ex.getStackTrace());}
-        UpdateMembers(clanName, clans.get(clanName).membersRole);
+        UpdateMembers(clanName);
     }
     static private void RecordClan(AClan newClan){
         String[] strings = RebuildStringsMemCR(newClan.membersRole);
@@ -145,7 +150,7 @@ public class AClan extends account implements IBalance {
         CRole crole = aClan.membersRole.get(memberName);
         if (crole.ordinal() < cr.length){
             crole = (cr[crole.ordinal()+1]);
-            UpdateMembers(clanName, aClan.membersRole);}
+            UpdateMembers(clanName);}
         else return false;
         return true;
     }
@@ -154,7 +159,7 @@ public class AClan extends account implements IBalance {
         CRole crole = aClan.membersRole.get(memberName);
         if (crole.ordinal() > 0){
             crole = (cr[crole.ordinal()-1]);
-            UpdateMembers(clanName, aClan.membersRole);}
+            UpdateMembers(clanName);}
         else return false;
         return true;
     }
@@ -162,7 +167,7 @@ public class AClan extends account implements IBalance {
         AClan aClan = clans.get(clanName);
         CRole crole = aClan.membersRole.get(memberName);
         crole = newCRole;
-        UpdateMembers(clanName, aClan.membersRole);
+        UpdateMembers(clanName);
         return true;
     }
     static public String SearchPlayer(String playerName) /*имя клана, к которому принадлежит игрок*/{
@@ -183,6 +188,13 @@ public class AClan extends account implements IBalance {
                         new String[] { sender } ,
                         new String[] {CRole.leader.toString()}));
                 APlayer.list.get(sender).ChangeClan(clanName);
+                AClan acl = clans.get(clanName);
+                String[] s = RebuildStringsMemCR(clans.get(clanName).membersRole);
+                QueryMaster.Insert(table, new rec[]{new rec(columnNames[0],clanName, true),
+                                        new rec(columnNames[1], clans.get(clanName).balance.toString()),
+                                        new rec(columnNames[2], sender, true),
+                                        new rec(columnNames[3], s[0], true),
+                                        new rec(columnNames[4], s[1], true)}, null);
                 return 0;
             } else return 403;
         }
@@ -205,7 +217,7 @@ public class AClan extends account implements IBalance {
             return 403;
         membersRole.put(playerName, CRole.member);
         APlayer.list.get(playerName).ChangeClan(this.Name);
-        UpdateMembers(this.Name, this.membersRole);
+        UpdateMembers(this.Name);
         return 0;
     }
     public int AddMember(String playerName, CRole cRole){
@@ -214,7 +226,7 @@ public class AClan extends account implements IBalance {
         if (cRole != CRole.leader) {
             membersRole.put(playerName, cRole);
             APlayer.list.get(playerName).ChangeClan(this.Name);
-            UpdateMembers(this.Name, this.membersRole);
+            UpdateMembers(this.Name);
         }
         else return 401; //не клановый лидер пытается получить доступ к команде лидера клана
         return 0;
@@ -225,7 +237,8 @@ public class AClan extends account implements IBalance {
         if (cRole != CRole.leader)
             membersRole.remove(playerName);
         else return 401;
-        UpdateMembers(Name, membersRole);
+        APlayer.list.get(playerName).ChangeClan("");
+        UpdateMembers(Name);
         return 0;
     }
 
@@ -277,7 +290,7 @@ public class AClan extends account implements IBalance {
         this.balance = balance;
         Name = name;
         this.clanLeader = clanLeader;
-        for (int i = 0; i < members.length - 1; i++){
+        for (int i = 0; i < members.length; i++){
             membersRole.put(members[i], CRole.valueOf(croles[i]));
         }
         //playerList = listOfMembers;

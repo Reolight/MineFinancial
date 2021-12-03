@@ -25,7 +25,7 @@ public class APlayer extends account implements IBalance{
     Type OwnerType = Type.player;
     public FRole frole;
 
-    static public void UpdateClan(APlayer player) {
+    static private void UpdateClan(APlayer player) {
         QueryMaster.Update(table, new rec[]{new rec(columnNames[3], player.MemberOfClan, true)},
                 new rec(columnNames[0], player.Name, true));
     }

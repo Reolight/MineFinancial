@@ -91,6 +91,9 @@ public class CommandClan implements CommandExecutor {
                     if (resc == 403) sender.sendMessage(ChatColor.RED+"Вы уже состоите в другом клане ("
                             +ChatColor.LIGHT_PURPLE+ AClan.SearchPlayer(sender.getName())+ChatColor.RED+")");
                     return true;
+                case "переименовать":
+                case "rename":
+                    if (acl == null || cr.ordinal() < 2)sender.sendMessage(ChatColor.RED+"Для выполнения этой команды ва должны быть лидером клана");
             }
         }
         return false;
