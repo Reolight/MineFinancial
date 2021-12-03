@@ -199,7 +199,7 @@ public class QueryMaster {
         }
     }
 
-    static public boolean Delete(String tableName, String[] columnNames, rec where){
+    static public boolean Delete(String tableName, rec where){
         //Table tab = tables.get(tableName);
         QueryMaster delete = new QueryMaster(QueryType.DELETE, tableName);
         delete.AddWhere(where.name +" = "+where.value);

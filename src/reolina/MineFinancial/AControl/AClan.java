@@ -2,6 +2,7 @@ package reolina.MineFinancial.AControl;
 
 import com.mysql.fabric.xmlrpc.base.Array;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.libs.jline.internal.Log;
 import org.bukkit.entity.Player;
 import reolina.MineFinancial.QueryMasterConstructor.Field;
@@ -93,11 +94,15 @@ public class AClan extends account implements IBalance {
         catch (Exception e) {log.severe("ADDING CLAN ERR: "+e+"\n"+e.getStackTrace());}
     }
     static public int RemoveClan(String sender, AClan clanToRemove){
-        if (clanToRemove.clanLeader == sender) {
-            QueryMaster rem = new QueryMaster(QueryMaster.QueryType.DELETE, table);
-            rem.AddWhere(columnNames[0] + " = \"" + clanToRemove.Name + "\""); //тут надо так же распорядиться оставшимся балансом клана!!!
+        if (clanToRemove.membersRole.get(sender) == CRole.leader) {
+            QueryMaster.Delete(table, new rec(columnNames[0], clanToRemove.Name, true));
+            for (String s : clanToRemove.membersRole.keySet()){
+                APlayer.list.get(s).ChangeClan("");
+                Bukkit.getPlayer(s).sendMessage(ChatColor.DARK_AQUA+"Клан "+
+                        ChatColor.DARK_PURPLE+clanToRemove+ChatColor.DARK_AQUA+" распущен");
+            }
             return 0;
-        } else return 2;
+        } else return 401;
     }
 
     @Override public String getName() {
@@ -129,7 +134,15 @@ public class AClan extends account implements IBalance {
         } else ClanList.append("Кланов нет");
         return ClanList.toString();
     }
-
+    public String GetMembersList(){
+        StringBuilder MemberList = new StringBuilder();
+        for (String s : membersRole.keySet()){
+            MemberList.append(membersRole.get(s) == CRole.leader ? ChatColor.RED+s+ChatColor.WHITE+", " :
+                    membersRole.get(s) == CRole.economist ? ChatColor.GREEN+s+ChatColor.WHITE+", " : s+", ");
+        }
+        MemberList.delete(MemberList.lastIndexOf(","),MemberList.length());
+        return MemberList.toString();
+    }
     static public int RenameClan(String oldName, String newName){
         if (clans.containsKey(newName))
             return 102; //the name is busy;
