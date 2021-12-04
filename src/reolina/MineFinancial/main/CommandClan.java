@@ -127,7 +127,6 @@ public class CommandClan implements CommandExecutor {
                     if (strClan == null) {sender.sendMessage(ChatColor.RED+"Такого клана не существует"); return true;}
                     sender.sendMessage(ChatColor.YELLOW+"Лидер клана "+ChatColor.LIGHT_PURPLE+strClan.Name+" — "+ChatColor.BLUE+strClan.clanLeader);
                     return true;
-
                 case "исключить":
                 case "expel":
                     if (acl != null){
