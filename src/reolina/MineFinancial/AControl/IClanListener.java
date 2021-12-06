@@ -1,8 +1,8 @@
 package reolina.MineFinancial.AControl;
 
 public interface IClanListener {
-    void onClanInviteAccept();
-    void onClanInviteDeny();
-    void onClanJoinAccept();
-    void onClanJoinDeny();
+    void onClanInviteAccept(int senderID);
+    void onClanInviteDeny(int senderID);
+    void onClanJoinAccept(int senderID);
+    void onClanJoinDeny(int senderID);
 }

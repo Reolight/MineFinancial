@@ -34,3 +34,9 @@ commands:
       /<command> [promote|demote] player - promote or demote player
       /<command> message <message> - clan chat;
     aliases: [клан]
+  rem:
+    description: for reply on requiests & showing notifications
+    usage:
+      /<command> [ID] [y|n] - reply on requiest
+      /<command> - list of requires (not implemented yet)
+    aliases: [reminder]

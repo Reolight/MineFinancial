@@ -7,7 +7,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import reolina.MineFinancial.AControl.AClan;
 import reolina.MineFinancial.AControl.APlayer;
+import reolina.MineFinancial.AControl.AReminder;
 import reolina.MineFinancial.definition.CRole;
+import reolina.MineFinancial.definition.ERemindersAction;
+import reolina.MineFinancial.definition.FRole;
 
 import java.util.ArrayList;
 
@@ -58,11 +61,13 @@ public class CommandClan implements CommandExecutor {
                 case "удалить":
                 case "remove":
                     if (acl == null) {sender.sendMessage(ChatColor.RED+"Вы не состоите в клане"); return true;}
-                    int remR = AClan.RemoveClan(sender.getName(), acl);
-                    if (remR == 401){
-                        sender.sendMessage("У вас недостаточно прав для этого");
+                    /*int remR = AClan.RemoveClan(sender.getName(), acl);*/
+                    if (acl.membersRole.get(sender.getName()) == CRole.leader){
+                        new AReminder(sender.getName(), sender.getName(),
+                                ChatColor.BOLD+""+ChatColor.BLUE+"Вы желаете распустить клан "+ChatColor.LIGHT_PURPLE+acl.Name+ChatColor.BLUE+"?",
+                                true, ERemindersAction.ClanDeletion);
                         return true;
-                    }
+                    } else sender.sendMessage("У вас недостаточно прав для этого");
                     return true;
                 case "лидер":
                 case "leader":
@@ -91,12 +96,28 @@ public class CommandClan implements CommandExecutor {
                     //Здесь должен создаться запрос, но пока принимаем автоматом
                     AClan applying = AClan.clans.get(args[1]);
                     if (applying != null) {
-                        applying.AddMember(sender.getName());
+                        new AReminder(applying.getLeader(), sender.getName(),
+                                ChatColor.AQUA+sender.getName()+" хочет вступить в клан "+ChatColor.LIGHT_PURPLE+applying.Name,
+                                true, ERemindersAction.ClanApplying);
+                        /*applying.AddMember(sender.getName());
                         sender.sendMessage(ChatColor.GREEN + "Вы присоединились к клану " + ChatColor.LIGHT_PURPLE + applying.Name);
                         applying.SendClanMessageExept(ChatColor.YELLOW+"Игрок " + ChatColor.AQUA + sender.getName() +
-                                        ChatColor.YELLOW+" присоединился к клану", new String[]{sender.getName()});
+                                        ChatColor.YELLOW+" присоединился к клану", new String[]{sender.getName()});*/
                     }
                     return true;
+                case "пригласить":
+                case "invite":
+                    if (acl != null){
+                        if (acl.membersRole.get(sender.getName()) == CRole.leader){
+                            if (APlayer.list.get(args[1]) != null) {
+                                new AReminder(args[1], sender.getName(),
+                                        ChatColor.AQUA+sender.getName()+ChatColor.GREEN+" вас приглашает в клан "
+                                                +ChatColor.LIGHT_PURPLE+acl.Name, true, ERemindersAction.ClanInvitation);
+                            } else { sender.sendMessage(ChatColor.RED+"Игрока "+ChatColor.DARK_AQUA+args[1]+ChatColor.RED+
+                                    " не существует"); return true; }
+                        } else {sender.sendMessage("У вас недостаточно прав для этого"); return true; }
+                    } else { sender.sendMessage(ChatColor.RED+"Вы не состоите в клане"); return true; }
+                    return false;
                 case "создать":
                 case "create":
                     int resc = AClan.CreateClan(args[1], sender.getName());
@@ -117,7 +138,7 @@ public class CommandClan implements CommandExecutor {
                         return true;}
                     String oldname = acl.Name;
                     int renRes = AClan.RenameClan(acl.Name, args[1]);
-                    if (renRes == 0) acl.SendClanMessage(ChatColor.YELLOW+"клан "+ChatColor.DARK_PURPLE+oldname+
+                    if (renRes == 0) acl.SendClanNotification(ChatColor.YELLOW+"клан "+ChatColor.DARK_PURPLE+oldname+
                             ChatColor.YELLOW+" переименован в "+ChatColor.LIGHT_PURPLE+acl.Name);
                     if (renRes == 102) {sender.sendMessage(ChatColor.RED+"Имя "+ChatColor.DARK_PURPLE+args[1]+" уже занято"); return true;}
                     return true;
@@ -135,7 +156,9 @@ public class CommandClan implements CommandExecutor {
                             if (rempl == 0) {
                                 acl.SendClanMessage(ChatColor.YELLOW+"Игрок "+ ChatColor.AQUA+args[1]+
                                         ChatColor.YELLOW+" исключён из клана "+ChatColor.LIGHT_PURPLE+acl.Name);
-                                Bukkit.getPlayer(args[1]).sendMessage(ChatColor.RED+"Вы были исключены из клана "+ChatColor.LIGHT_PURPLE+acl.Name);
+                                new AReminder(args[1], sender.getName(),
+                                        ChatColor.RED+"Вы были исключены из клана "+ChatColor.LIGHT_PURPLE+acl.Name,
+                                        false, null);
                                 return true;
                             }
                             if (rempl == 401) {

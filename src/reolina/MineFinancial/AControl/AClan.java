@@ -96,11 +96,12 @@ public class AClan extends account implements IBalance {
     static public int RemoveClan(String sender, AClan clanToRemove){
         if (clanToRemove.membersRole.get(sender) == CRole.leader) {
             QueryMaster.Delete(table, new rec(columnNames[0], clanToRemove.Name, true));
-            for (String s : clanToRemove.membersRole.keySet()){
+            for (String s : clanToRemove.membersRole.keySet()) {
                 APlayer.list.get(s).ChangeClan("");
-                Bukkit.getPlayer(s).sendMessage(ChatColor.DARK_AQUA+"Клан "+
-                        ChatColor.DARK_PURPLE+clanToRemove+ChatColor.DARK_AQUA+" распущен");
             }
+            clanToRemove.SendClanNotification(ChatColor.DARK_AQUA+"Клан "+
+                        ChatColor.DARK_PURPLE+clanToRemove+ChatColor.DARK_AQUA+" распущен");
+            AClan.clans.remove(clanToRemove);
             return 0;
         } else return 401;
     }
@@ -213,16 +214,27 @@ public class AClan extends account implements IBalance {
         }
     }
 
+    public void SendClanNotification(String Message){
+        for (String s : membersRole.keySet()){
+            if (Bukkit.getPlayer(s).isOnline())
+                Bukkit.getPlayer(s).sendMessage(Message);
+            else
+                new AReminder(s, this.clanLeader, Message, false, null);
+        }
+    }
     public void SendClanMessage(String Message){
         for (String s : membersRole.keySet()){
             Bukkit.getPlayer(s).sendMessage(Message);
         }
     }
-    public void SendClanMessageExept(String Message, String[] Except){
+    public void SendClanNotificationExcept(String Message, String[] Except){
         List<String> NamesExcept = Arrays.asList(Except);
         for (String s : membersRole.keySet()){
             if (NamesExcept.contains(s)) continue;
-            Bukkit.getPlayer(s).sendMessage(Message);
+            if (Bukkit.getPlayer(s).isOnline())
+                    Bukkit.getPlayer(s).sendMessage(Message);
+            else
+                new AReminder(s, this.clanLeader, Message, false, null);
         }
     }
     public int AddMember(String playerName){
@@ -231,6 +243,9 @@ public class AClan extends account implements IBalance {
         membersRole.put(playerName, CRole.member);
         APlayer.list.get(playerName).ChangeClan(this.Name);
         UpdateMembers(this.Name);
+        Bukkit.getPlayer(playerName).sendMessage(ChatColor.GREEN + "Вы присоединились к клану " + ChatColor.LIGHT_PURPLE + this.Name);
+        this.SendClanNotificationExcept(ChatColor.YELLOW+"Игрок " + ChatColor.AQUA + playerName +
+                ChatColor.YELLOW+" присоединился к клану", new String[]{playerName});
         return 0;
     }
     public int AddMember(String playerName, CRole cRole){
@@ -256,7 +271,7 @@ public class AClan extends account implements IBalance {
     }
 
     public int ChangeLeader(String sender, String newLeaderName){ //следует ли сделать static???
-        if (clanLeader == sender){
+        if (membersRole.get(sender) == CRole.leader){
             if (membersRole.keySet().contains(newLeaderName)){
                 CRole cRole = membersRole.get(newLeaderName);
                 cRole = CRole.leader;
@@ -264,11 +279,15 @@ public class AClan extends account implements IBalance {
                 cRole = CRole.economist; //снижаем до экономиста
                 clanLeader = newLeaderName;
                 UpdateLeaderName(this.Name, newLeaderName);
+                SendClanNotification(ChatColor.DARK_AQUA+sender+ChatColor.YELLOW+" оставил пост лидера. Новый лидер - "+ChatColor.AQUA+newLeaderName);
                 return 0;
             } else return 1;//(ChatColor.AQUA+newLeaderName+ChatColor.RED+" не является членом клана "+ChatColor.LIGHT_PURPLE+Name);
         } else {
             return 2;//(ChatColor.RED+"Вы не являетесь лидером клана "+ChatColor.LIGHT_PURPLE+Name);
         }
+    }
+    public String getLeader(){
+        return clanLeader;
     }
 
     public static void init(){

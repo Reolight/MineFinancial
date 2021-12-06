@@ -127,6 +127,7 @@ public class QueryMaster {
             if (where != null)
                 query.append(where);
             log.info("Q: "+ query.toString());
+            statement.executeUpdate(query.toString());
         }
         statement.close();
         }
@@ -185,11 +186,15 @@ public class QueryMaster {
         }
     }
 
-    static public ResultSet Select(String tableName, String[] columnNames, @Nullable rec where){
+    static public ResultSet Select(String tableName, @Nullable String[] columnNames, @Nullable rec where){
         //Table tab = tables.get(tableName);
         QueryMaster select = new QueryMaster(QueryType.SELECT, tableName);
-        select.SelectFields(columnNames);
-        select.AddWhere(where.name +" = "+ where.value);
+        if (columnNames != null)
+            select.SelectFields(columnNames);
+        if (where != null) {
+            select.AddWhere(where.name + " = " + where.value);
+            select.where = null;
+        }
         try {
             ResultSet rs = select.ExecuteElection();
             return rs;

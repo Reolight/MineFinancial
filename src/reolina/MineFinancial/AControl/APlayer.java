@@ -44,6 +44,7 @@ public class APlayer extends account implements IBalance{
         return 0;
     }
 
+    public String getMemberOfClan() {return MemberOfClan; }
     @Override public String getName() {
         return Name;
     }
