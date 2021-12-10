@@ -45,19 +45,19 @@ public class APlayer extends account implements IBalance{
     }
 
     public String getMemberOfClan() {return MemberOfClan; }
+    @Override public Type getOwnerType(){
+        return OwnerType;
+    }
     @Override public String getName() {
         return Name;
     }
     @Override public int ChangeBalance(BigDecimal delta) {
-        if (balance.subtract(delta).compareTo(_zero) < 0)
-            return 100;
-        balance = balance.subtract(delta);
+        int res = super.ChangeBalance(delta);
+        if (res > 0) return res;
         return UpdateBalance(this);
     }
     @Override public int SubsBalance(BigDecimal delta) {
-        delta = _zero.subtract(delta);
-        int res = ChangeBalance(delta);
-        return res;
+        return ChangeBalance(delta.negate());
     }
     @Override public int AddBalance(BigDecimal delta) {
         return ChangeBalance(delta);

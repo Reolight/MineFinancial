@@ -24,6 +24,7 @@ public class MineFinancial extends JavaPlugin {
         getCommand("finrole").setExecutor(new CommandFinrole(this));
         getCommand("clan").setExecutor(new CommandClan(this));
         getCommand("rem").setExecutor(new CommandReminder(this));
+        getCommand("pay").setExecutor(new CommandTransaction(this));
     }
 
     public void onDisable(){

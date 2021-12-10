@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 public class AReminder {
     static int lastID = 0;
     static final String table = "reminders";
+                                         //0     1          2         3         4             5
     static final String[] columnNames = {"id", "getter", "sender", "reminder", "need_reply", "action"};
     static Logger log = Logger.getLogger("Minecraft");
     int id;
@@ -64,8 +65,8 @@ public class AReminder {
         var pl = Bukkit.getPlayer(remToSend.getter);
         pl.sendMessage((remToSend.ERAction == null ? "" : ChatColor.ITALIC+""+ChatColor.GRAY + remToSend.id+": " +ChatColor.RESET) + remToSend.reminder
                 +(remToSend.isApproval ? ChatColor.ITALIC+""+ChatColor.GRAY + " (/rem ID [y|n})" : ""));
-        if (!(remToSend.isApproval) && remToSend.isInDatabase) {
-            log.info("deleting reminder: !remToSend.isApproval is "+(!remToSend.isApproval)+" remToSend.isInDatabase is "+ remToSend.isInDatabase+" and in toto: "
+        if (!(remToSend.isApproval) & remToSend.isInDatabase) {
+            log.info("deleting reminder: !remToSend.isApproval is "+!(remToSend.isApproval)+" remToSend.isInDatabase is "+ remToSend.isInDatabase+" and in toto: "
                 +(!(remToSend.isApproval) && remToSend.isInDatabase));
             QueryMaster.Delete(table, new rec(columnNames[0], Integer.toString(remToSend.id)));
             remList.remove(remToSend);
@@ -93,7 +94,7 @@ public class AReminder {
                 ERemindersAction era = null;
                 try{ era = ERemindersAction.valueOf(rs.getString(columnNames[5])); } catch (Exception e) {}
                 remList.add(new AReminder(rs.getInt(columnNames[0]), rs.getString(columnNames[1]), rs.getString(columnNames[2]),
-                        rs.getString(columnNames[3]), rs.getString(columnNames[4]) == "true",
+                        rs.getString(columnNames[3]), rs.getString(columnNames[4]).equalsIgnoreCase("true"),
                         era));
                 lastID++;
             }
@@ -134,9 +135,12 @@ public class AReminder {
             this.sender = sender;
             if (eraction != null)
                 ERAction = eraction;
-            if (APlayer.list.get(getter) == null)
-                throw new NullPointerException("Нет игрока c именем " + ChatColor.AQUA + getter);
-            this.getter = getter;
+            if (APlayer.list.get(getter) == null) {
+                AClan acl = AClan.clans.get(getter);
+                if (acl == null) throw new NullPointerException("Нет игрока/клана c именем " + ChatColor.DARK_AQUA + getter);
+                this.getter = acl.clanLeader;
+            } else
+                this.getter = getter;
             reminder = remind;
             this.isApproval = isApproval;
             id = ++lastID;

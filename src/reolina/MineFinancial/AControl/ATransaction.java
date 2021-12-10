@@ -1,12 +1,14 @@
 package reolina.MineFinancial.AControl;
 
 import com.mojang.brigadier.Message;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import reolina.MineFinancial.QueryMasterConstructor.*;
 import reolina.MineFinancial.definition.Type;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 import java.util.Map;
@@ -44,30 +46,28 @@ public class ATransaction{
 
     static public void init(){
         try{
-            ResultSet rs = QueryMaster.Select(table,
-                    new String[] {columnNames[0],columnNames[1],columnNames[2],columnNames[3],columnNames[4],
-                            columnNames[5],columnNames[6],columnNames[7],columnNames[8],columnNames[9]}, null);
+            ResultSet rs = QueryMaster.Select(table, null, null);
             while (rs.next()){
-                if (!rs.getBoolean(columnNames[9])){
-                    UnflyedList.add(new ATransaction(rs.getInt(columnNames[0]), rs.getString(columnNames[1]),
-                            rs.getString(columnNames[2]), rs.getString(columnNames[3]), rs.getString(columnNames[4]),
-                            rs.getBigDecimal(columnNames[5]),rs.getBoolean(columnNames[9])));
-                }
-                //transactionList.add(new ATransaction())
+                ATransaction temp = new ATransaction(rs.getInt(columnNames[0]), rs.getString(columnNames[1]), rs.getString(columnNames[2]),
+                        rs.getString(columnNames[3]), rs.getString(columnNames[4]), rs.getBigDecimal(columnNames[5]),
+                        rs.getBoolean(columnNames[9]));
+                if (temp.isFlyed == false)
+                    UnflyedList.add(temp);
             }
-        } catch (Exception ex) {
-            QueryMaster.Create(new Table(table, new Field[]
-                    {new Field(SQLtype.INTEGER, columnNames[0], true, true),
+        } catch (Exception ex)
+        {
+            log.warning("ERR: "+ex.toString()+"\n"+ex.getStackTrace());
+            QueryMaster.Create(new Table(table,
+                    new Field[]{new Field(SQLtype.INTEGER, columnNames[0], true, true),
                             new Field(SQLtype.TEXT, columnNames[1], true),
                             new Field(SQLtype.TEXT, columnNames[2], true),
                             new Field(SQLtype.TEXT, columnNames[3], true),
                             new Field(SQLtype.TEXT, columnNames[4], true),
                             new Field(SQLtype.REAL, columnNames[5], true),
                             new Field(SQLtype.TEXT, columnNames[6]),
-                            new Field(SQLtype.TEXT, columnNames[7]),
+                            new Field(SQLtype.INT, columnNames[7]),
                             new Field(SQLtype.TEXT, columnNames[8]),
-                            new Field(SQLtype.TEXT, columnNames[9], true),
-                    }));
+                            new Field(SQLtype.TEXT, columnNames[9])}));
         }
     }
 
@@ -85,37 +85,57 @@ public class ATransaction{
             default: return "Error code "+errorCode;
         }
     }
-    public int fly(ATransaction t){
-        int SenderResult = t.sender.SubsBalance(amount);
+    static public int Fly(ATransaction t){
+        int SenderResult = t.sender.SubsBalance(t.amount);
         int GetterResult = 0;
         if (SenderResult == 0) {
-            GetterResult = t.getter.AddBalance(amount);
+            GetterResult = t.getter.AddBalance(t.amount);
             if (GetterResult == 0) t.isFlyed = true;
+            else t.sender.AddBalance(t.amount);
         }
         if (SenderResult == 100) t.errorCode = 300;
         if (SenderResult == 200) t.errorCode = 301;
         if (GetterResult == 100) t.errorCode = 310;
         if (GetterResult == 200) t.errorCode = 311;
         if (SenderResult > 0 || GetterResult > 0) t.errorCode = 399;
-        return t.errorCode;
 
+        if (t.isFlyed) {
+            if (t.sender.getOwnerType() != Type.bank)
+                new AReminder(t.sender.getName(), t.sender.getName(), ChatColor.GREEN+ "Отправлено "+ (t.getterType == Type.player ? "игроку " + t.getter.getName() :
+                    (t.getterType == Type.clan ? "клану " + t.getter.getName() : " в банк") + ChatColor.YELLOW+t.amount.toString()), false, null);
+            if (t.getter.getOwnerType() != Type.bank )
+                new AReminder(t.getter.getName(), t.getter.getName(), ChatColor.GREEN+ "Получено от "+ (t.senderType == Type.player ? "игрока " + t.sender.getName() :
+                        "клана " + t.sender.getName() + ChatColor.YELLOW+t.amount.toString()), false, null);
+            if (UnflyedList.contains(t)) UnflyedList.remove(t);
+            QueryMaster.Update(table, new rec[]{new rec(columnNames[9], t.isFlyed ? "true" : "false", true)},
+                    new rec(columnNames[0], Integer.toString(t.id)));
+        } else Bukkit.getPlayer(t.sender.getName()).sendMessage(t.Message());
+        return t.errorCode;
     }
 
-    public ATransaction(IBalance sender, Type senderType, //sender
-                        IBalance getter, Type getterType, //getter(?)
-                        BigDecimal amount){
+    public ATransaction(IBalance sender, //Type senderType, //sender
+                        IBalance getter, //Type getterType, //getter(?)
+                        BigDecimal amount){ //простая транзакция
         id = ++lastID;
         this.sender = sender;
-        this.senderType = senderType;
+        this.senderType = sender.getOwnerType();
         this.getter = getter;
-        this.getterType = getterType;
+        this.getterType = getter.getOwnerType();
         this.amount = amount;
+        QueryMaster.Insert(table, new rec[]{new rec(columnNames[0], Integer.toString(this.id)),
+                                            new rec(columnNames[1], this.sender.getName(), true),
+                                            new rec(columnNames[2], this.sender.getOwnerType().toString(), true),
+                                            new rec(columnNames[3], this.getter.getName(), true),
+                                            new rec(columnNames[4], this.getter.getOwnerType().toString(), true),
+                                            new rec(columnNames[5], this.amount.toString()),
+                                            new rec(columnNames[9], this.isFlyed ?  "true" : "false", true)}, null);
+        Fly(this);
     }
 
-    public ATransaction(int id, String sender, String senderType, //sender
+    private ATransaction(int id, String sender, String senderType, //sender
                         String getter, String getterType, //getter(?)
                         BigDecimal amount,
-                        boolean flyed){
+                        boolean flyed) {
         this.id = id;
         this.senderType = Type.valueOf(senderType);
         this.getterType = Type.valueOf(getterType);
@@ -129,5 +149,4 @@ public class ATransaction{
         this.isFlyed = flyed;
     }
     //public ATransaction(IBalance sender, IBalance getter, ITEM/BLOCK???);
-
 }

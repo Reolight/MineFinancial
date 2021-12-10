@@ -3,6 +3,7 @@ package reolina.MineFinancial.AControl;
 import reolina.MineFinancial.QueryMasterConstructor.Field;
 import reolina.MineFinancial.QueryMasterConstructor.QueryMaster;
 import reolina.MineFinancial.QueryMasterConstructor.SQLtype;
+import reolina.MineFinancial.definition.Type;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -14,7 +15,7 @@ public class ABank extends account implements IBalance{ //def for bank(?)
     static Logger log = Logger.getLogger("Minecraft");
     static private final String table = "bank";
     static private final String[] columnName = {"id", "emission", "balance"};
-
+    Type OwnerType = Type.bank;
     private int UpdateBalance()
     {
         try{
@@ -44,26 +45,23 @@ public class ABank extends account implements IBalance{ //def for bank(?)
             return false;
         }
     }
+
+    @Override public Type getOwnerType() {
+        return OwnerType;
+    }
+
     @Override public String getName(){
         return "bank";
     }
-    @Override
-    public int ChangeBalance(BigDecimal delta) {
-        if (balance.subtract(delta).compareTo(_zero) < 0)
-            return 100;
-        balance = balance.subtract(delta);
+    @Override public int ChangeBalance(BigDecimal delta) {
+        int res = super.ChangeBalance(delta);
+        if (res > 0) return res;
         return UpdateBalance();
     }
-
-    @Override
-    public int SubsBalance(BigDecimal delta) {
-        delta = _zero.subtract(delta);
-        int res = ChangeBalance(delta);
-        return res;
+    @Override public int SubsBalance(BigDecimal delta) {
+        return ChangeBalance(delta.negate());
     }
-
-    @Override
-    public int AddBalance(BigDecimal delta) {
+    @Override public int AddBalance(BigDecimal delta) {
         return ChangeBalance(delta);
     }
 

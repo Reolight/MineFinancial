@@ -95,6 +95,12 @@ public class AClan extends account implements IBalance {
     }
     static public int RemoveClan(String sender, AClan clanToRemove){
         if (clanToRemove.membersRole.get(sender) == CRole.leader) {
+            BigDecimal dividing = clanToRemove.balance.divide(new BigDecimal(clanToRemove.membersRole.size())).setScale(2);
+            for (String s : clanToRemove.membersRole.keySet()){
+                new ATransaction(clanToRemove, APlayer.list.get(s), dividing); //распил кланового бюджета
+            }
+            if (clanToRemove.balance.compareTo(_zero) > 0)
+                new ATransaction(clanToRemove, ABank.getInstance(), clanToRemove.balance); //остаток денег честно возвращается в банк, чтобы не терялись
             QueryMaster.Delete(table, new rec(columnNames[0], clanToRemove.Name, true));
             for (String s : clanToRemove.membersRole.keySet()) {
                 APlayer.list.get(s).ChangeClan("");
@@ -106,19 +112,19 @@ public class AClan extends account implements IBalance {
         } else return 401;
     }
 
+    @Override public Type getOwnerType(){
+        return OwnerType;
+    }
     @Override public String getName() {
         return Name;
     }
     @Override public int ChangeBalance(BigDecimal delta) {
-        if (balance.subtract(delta).compareTo(_zero) < 0)
-            return 100;
-        balance = balance.subtract(delta);
+        int res = super.ChangeBalance(delta);
+        if (res > 0) return res;
         return UpdateBalance(this);
     }
     @Override public int SubsBalance(BigDecimal delta) {
-        delta = _zero.subtract(delta);
-        int res = ChangeBalance(delta);
-        return res;
+        return ChangeBalance(delta.negate());
     }
     @Override public int AddBalance(BigDecimal delta) {
         return ChangeBalance(delta);
@@ -194,7 +200,7 @@ public class AClan extends account implements IBalance {
     }
     static public int CreateClan(String clanName, String sender){
         var listOfClans = clans.values();
-        if (listOfClans.contains(clanName))
+        if (listOfClans.contains(clanName) || clanName.equalsIgnoreCase("bank") || clanName.equalsIgnoreCase("банк"))
             return 102;
         else{
             if (SearchPlayer(sender) == null) {

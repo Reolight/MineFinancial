@@ -40,3 +40,9 @@ commands:
       /<command> [ID] [y|n] - reply on requiest
       /<command> - list of requires (not implemented yet)
     aliases: [reminder]
+  pay:
+    description: for payment or trade
+    usage:
+      /<command> [#toClan|@toPlayer|$toBank] amount - pay to instance
+      /<command> [@RelevantClan] [#toClan|@toPlayer|$toBank] amount - pay from clan to instance
+    aliases: [transaction]

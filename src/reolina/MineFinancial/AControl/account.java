@@ -27,20 +27,25 @@ public class account implements IBalance{
         balance = _balance;
     }
 
-    @Override
-    public String getName() {
+    @Override public String getName() {
+        return null;
+    }
+    @Override public Type getOwnerType(){
         return null;
     }
 
-    public int ChangeBalance(BigDecimal delta) {
-        return 10;
+    @Override public int ChangeBalance(BigDecimal delta) {
+        if (balance.add(delta).compareTo(_zero) < 0)
+            return 100;
+        balance = balance.add(delta);
+        return 0;
     }
-
-    public int SubsBalance(BigDecimal delta) {
-        return 10;
+    @Override public int SubsBalance(BigDecimal delta) {
+        delta = delta.negate();
+        int res = ChangeBalance(delta);
+        return res;
     }
-
-    public int AddBalance(BigDecimal delta) {
-        return 10;
+    @Override public int AddBalance(BigDecimal delta) {
+        return ChangeBalance(delta);
     }
 }

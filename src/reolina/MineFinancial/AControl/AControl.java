@@ -22,5 +22,6 @@ public class AControl {
         APlayer.init();
         AClan.init();
         AReminder.init();
+        ATransaction.init();
     }
 }
