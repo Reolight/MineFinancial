@@ -86,7 +86,7 @@ public class AClan extends account implements IBalance {
         String[] strings = RebuildStringsMemCR(newClan.membersRole);
         QueryMaster recc = new QueryMaster(QueryMaster.QueryType.INSERT, table);
         recc.AddValue(columnNames[0], newClan.Name, true);
-        recc.AddValue(columnNames[1], newClan.GetBalance().toString());
+        recc.AddValue(columnNames[1], newClan.getBalance().toString());
         recc.AddValue(columnNames[2], newClan.clanLeader, true );
         recc.AddValue(columnNames[3], strings[0], true);
         recc.AddValue(columnNames[4], strings[4], true);
@@ -129,6 +129,7 @@ public class AClan extends account implements IBalance {
     @Override public int AddBalance(BigDecimal delta) {
         return ChangeBalance(delta);
     }
+    @Override public BigDecimal getBalance() { return balance; }
 
     static public String GetClanList(){
         StringBuilder ClanList = new StringBuilder();
@@ -222,7 +223,7 @@ public class AClan extends account implements IBalance {
 
     public void SendClanNotification(String Message){
         for (String s : membersRole.keySet()){
-            if (Bukkit.getPlayer(s).isOnline())
+            if (Bukkit.getPlayer(s) != null && Bukkit.getPlayer(s).isOnline())
                 Bukkit.getPlayer(s).sendMessage(Message);
             else
                 new AReminder(s, this.clanLeader, Message, false, null);
@@ -230,13 +231,15 @@ public class AClan extends account implements IBalance {
     }
     public void SendClanMessage(String Message){
         for (String s : membersRole.keySet()){
-            Bukkit.getPlayer(s).sendMessage(Message);
+            if (Bukkit.getPlayer(s) != null && Bukkit.getPlayer(s).isOnline())
+                Bukkit.getPlayer(s).sendMessage(Message);
         }
     }
     public void SendClanNotificationExcept(String Message, String[] Except){
         List<String> NamesExcept = Arrays.asList(Except);
         for (String s : membersRole.keySet()){
             if (NamesExcept.contains(s)) continue;
+            if (Bukkit.getPlayer(s) == null) continue;
             if (Bukkit.getPlayer(s).isOnline())
                     Bukkit.getPlayer(s).sendMessage(Message);
             else

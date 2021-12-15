@@ -39,16 +39,20 @@ public class CommandPlayer implements CommandExecutor {
                     }
                     switch (args[0]) {
                         case "баланс":
-                            sender.sendMessage(ChatColor.GREEN + "У вас на балансе " + ChatColor.AQUA + apl.GetBalanceString());
+                            sender.sendMessage(ChatColor.GREEN + "У вас на балансе " + ChatColor.GOLD + apl.GetBalanceString());
                             return true;
                         case "финроль":
                             sender.sendMessage(ChatColor.GREEN + "Вы " + chc[apl.frole.ordinal()] + finr[apl.frole.ordinal()]);
                             return true;
                         case "balance":
-                            sender.sendMessage(ChatColor.GREEN + "You have " + ChatColor.AQUA + apl.GetBalanceString());
+                            sender.sendMessage(ChatColor.GREEN + "You have " + ChatColor.GOLD + apl.GetBalanceString());
                             return true;
                         case "finrole":
                             sender.sendMessage(ChatColor.GREEN + "You are " + chc[apl.frole.ordinal()] + apl.frole);
+                            return true;
+                        case "почта":
+                        case "mail":
+                            APlayer.list.get(senderName).mailShow(Bukkit.getPlayer(senderName));
                             return true;
                         default:
                             sender.sendMessage(ChatColor.RED + "Unknown command: " + args[0]);

@@ -56,7 +56,7 @@ public class CommandClan implements CommandExecutor {
                     if (cr.ordinal()<1)
                         sender.sendMessage("У вас недостаточно прав для этого");
                     else sender.sendMessage(ChatColor.YELLOW+"Баланс клана "+ChatColor.LIGHT_PURPLE+acl.Name+ChatColor.YELLOW+
-                            " составляет "+ChatColor.AQUA+acl.GetBalanceString());
+                            " составляет "+ChatColor.GOLD+acl.GetBalanceString());
                     return true;
                 case "удалить":
                 case "remove":
@@ -113,11 +113,11 @@ public class CommandClan implements CommandExecutor {
                                 new AReminder(args[1], sender.getName(),
                                         ChatColor.AQUA+sender.getName()+ChatColor.GREEN+" вас приглашает в клан "
                                                 +ChatColor.LIGHT_PURPLE+acl.Name, true, ERemindersAction.ClanInvitation);
+                                return true;
                             } else { sender.sendMessage(ChatColor.RED+"Игрока "+ChatColor.DARK_AQUA+args[1]+ChatColor.RED+
                                     " не существует"); return true; }
                         } else {sender.sendMessage("У вас недостаточно прав для этого"); return true; }
                     } else { sender.sendMessage(ChatColor.RED+"Вы не состоите в клане"); return true; }
-                    return false;
                 case "создать":
                 case "create":
                     int resc = AClan.CreateClan(args[1], sender.getName());

@@ -83,7 +83,7 @@ public class CommandTransaction implements CommandExecutor {
         }
 
         try{
-            amount = new BigDecimal(args[1]);
+            amount = new BigDecimal(args[str]);
             if (amount.compareTo(new BigDecimal(0)) < 1){
                 sender.sendMessage(ChatColor.RED+"Сумма платежа не может быть отрицательной или равной нулю");
                 return true;

@@ -29,7 +29,7 @@ public class PlayerLogEvents implements Listener {
         event.setJoinMessage("");
         if (APlayer.list.containsKey(player.getName())) {
             player.sendMessage(ChatColor.GREEN+"Здравствуй, "+ChatColor.AQUA+player.getName()+"!");
-            if (APlayer.list.get(player.getName()).getMemberOfClan() != "")
+            if (APlayer.list.get(player.getName()).getMemberOfClan() != null && !APlayer.list.get(player.getName()).getMemberOfClan().equalsIgnoreCase(""))
                 AClan.clans.get(APlayer.list.get(player.getName()).getMemberOfClan()).SendClanNotificationExcept(
                         ChatColor.DARK_AQUA+""+ChatColor.ITALIC+player.getName()+ChatColor.GRAY+" зашёл на сервер",
                         new String[]{player.getName()});
@@ -42,7 +42,7 @@ public class PlayerLogEvents implements Listener {
     @EventHandler public void onPlayerQuit(PlayerQuitEvent event){
         event.setQuitMessage("");
         Player player = event.getPlayer();
-        if (APlayer.list.get(player.getName()).getMemberOfClan() != "")
+        if (APlayer.list.get(player.getName()).getMemberOfClan() != null && !APlayer.list.get(player.getName()).getMemberOfClan().equalsIgnoreCase(""))
             AClan.clans.get(APlayer.list.get(player.getName()).getMemberOfClan()).SendClanNotificationExcept(
                     ChatColor.DARK_AQUA+""+ChatColor.ITALIC+player.getName()+ChatColor.GRAY+" вышел с сервера",
                     new String[]{player.getName()});

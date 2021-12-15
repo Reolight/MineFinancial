@@ -13,7 +13,7 @@ public class account implements IBalance{
     void DisplayBalance() {} //displaying curr balance
 
     //static protected boolean UpdateBalance(String name) {return false; }
-    public BigDecimal GetBalance() { return balance; }
+    @Override public BigDecimal getBalance() { return balance; }
     public String GetBalanceString() {return "¥"+balance; }
 
     public void Sub(BigDecimal subsd)

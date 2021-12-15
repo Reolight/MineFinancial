@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Logger;
 import java.util.Map;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ public class ATransaction{
     Type getterType;
     BigDecimal amount;
     String itemID; int ItemAmount; String meta;
+
     private int errorCode;
     public boolean isFlyed;
     private static final String table = "transactions";
@@ -51,12 +53,13 @@ public class ATransaction{
                 ATransaction temp = new ATransaction(rs.getInt(columnNames[0]), rs.getString(columnNames[1]), rs.getString(columnNames[2]),
                         rs.getString(columnNames[3]), rs.getString(columnNames[4]), rs.getBigDecimal(columnNames[5]),
                         rs.getBoolean(columnNames[9]));
-                if (temp.isFlyed == false)
+                lastID++;
+                if (!temp.isFlyed)
                     UnflyedList.add(temp);
             }
         } catch (Exception ex)
         {
-            log.warning("ERR: "+ex.toString()+"\n"+ex.getStackTrace());
+            log.warning("ERR: "+ex.toString()+"\n"+ Arrays.toString(ex.getStackTrace()));
             QueryMaster.Create(new Table(table,
                     new Field[]{new Field(SQLtype.INTEGER, columnNames[0], true, true),
                             new Field(SQLtype.TEXT, columnNames[1], true),
@@ -85,7 +88,20 @@ public class ATransaction{
             default: return "Error code "+errorCode;
         }
     }
-    static public int Fly(ATransaction t){
+
+    static public int Fly(ATransaction t){ //разделено в целях возможности отправки разных сообщений
+        FlyDef(t);
+        Report(t);
+        return t.errorCode;
+    }
+    static public int Fly(ATransaction t, String MessageToGetter, String MessageToSender){
+        FlyDef(t);
+        new AReminder(t.getter.getName(), t.sender.getName(), MessageToGetter, false, null);
+        new AReminder(t.sender.getName(), t.sender.getName(), MessageToSender, false, null );
+        return t.errorCode;
+    }
+
+    static public int FlyDef(ATransaction t) {
         int SenderResult = t.sender.SubsBalance(t.amount);
         int GetterResult = 0;
         if (SenderResult == 0) {
@@ -97,21 +113,24 @@ public class ATransaction{
         if (SenderResult == 200) t.errorCode = 301;
         if (GetterResult == 100) t.errorCode = 310;
         if (GetterResult == 200) t.errorCode = 311;
-        if (SenderResult > 0 || GetterResult > 0) t.errorCode = 399;
+        if (t.errorCode > 0) log.warning("transaction error code: "+t.errorCode);
+        return t.errorCode;
+    }
 
+    static private void Report(ATransaction t){
         if (t.isFlyed) {
             if (t.sender.getOwnerType() != Type.bank)
                 new AReminder(t.sender.getName(), t.sender.getName(), ChatColor.GREEN+ "Отправлено "+ (t.getterType == Type.player ? "игроку " + t.getter.getName() :
-                    (t.getterType == Type.clan ? "клану " + t.getter.getName() : " в банк") + ChatColor.YELLOW+t.amount.toString()), false, null);
+                    (t.getterType == Type.clan ? "клану " + t.getter.getName() : " в банк"))+ChatColor.GOLD+" ¥"+t.amount.toString(), false, null);
             if (t.getter.getOwnerType() != Type.bank )
                 new AReminder(t.getter.getName(), t.getter.getName(), ChatColor.GREEN+ "Получено от "+ (t.senderType == Type.player ? "игрока " + t.sender.getName() :
-                        "клана " + t.sender.getName() + ChatColor.YELLOW+t.amount.toString()), false, null);
+                        "клана " + t.sender.getName())+ChatColor.GOLD+" ¥"+t.amount, false, null);
             if (UnflyedList.contains(t)) UnflyedList.remove(t);
             QueryMaster.Update(table, new rec[]{new rec(columnNames[9], t.isFlyed ? "true" : "false", true)},
                     new rec(columnNames[0], Integer.toString(t.id)));
-        } else Bukkit.getPlayer(t.sender.getName()).sendMessage(t.Message());
-        return t.errorCode;
+        } else new AReminder(t.getter.getName(), t.sender.getName(), t.Message(), false, null);
     }
+
 
     public ATransaction(IBalance sender, //Type senderType, //sender
                         IBalance getter, //Type getterType, //getter(?)
@@ -130,6 +149,25 @@ public class ATransaction{
                                             new rec(columnNames[5], this.amount.toString()),
                                             new rec(columnNames[9], this.isFlyed ?  "true" : "false", true)}, null);
         Fly(this);
+    }
+    public ATransaction(IBalance sender, //Type senderType, //sender
+                        IBalance getter, //Type getterType, //getter(?)
+                        BigDecimal amount,
+                        String MessageToGetter, String MessageToSender){ //простая транзакция
+        id = ++lastID;
+        this.sender = sender;
+        this.senderType = sender.getOwnerType();
+        this.getter = getter;
+        this.getterType = getter.getOwnerType();
+        this.amount = amount;
+        QueryMaster.Insert(table, new rec[]{new rec(columnNames[0], Integer.toString(this.id)),
+                new rec(columnNames[1], this.sender.getName(), true),
+                new rec(columnNames[2], this.sender.getOwnerType().toString(), true),
+                new rec(columnNames[3], this.getter.getName(), true),
+                new rec(columnNames[4], this.getter.getOwnerType().toString(), true),
+                new rec(columnNames[5], this.amount.toString()),
+                new rec(columnNames[9], this.isFlyed ?  "true" : "false", true)}, null);
+        Fly(this, MessageToGetter, MessageToSender);
     }
 
     private ATransaction(int id, String sender, String senderType, //sender

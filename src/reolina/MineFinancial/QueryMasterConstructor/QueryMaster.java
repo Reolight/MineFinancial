@@ -29,7 +29,7 @@ public class QueryMaster {
     String where;
 
     List<rec> records;
-    public enum QueryType {CREATE, INSERT, UPDATE, SELECT, DELETE}
+    public enum QueryType {CREATE, INSERT, UPDATE, SELECT, DELETE, DROP}
     QueryType type;
     StringBuilder query;
 
@@ -40,6 +40,7 @@ public class QueryMaster {
             case UPDATE : query = new StringBuilder("UPDATE "+TableName.toLowerCase()+" SET "); break;
             case SELECT : query = new StringBuilder("SELECT * FROM "+TableName.toLowerCase()+" "); break;
             case DELETE : query = new StringBuilder("DELETE FROM "+TableName.toLowerCase()+" "); break;
+            case DROP   : query = new StringBuilder("DROP TABLE IF EXISTS "+TableName);
         }
         type = queryType;
     }
@@ -129,8 +130,13 @@ public class QueryMaster {
             log.info("Q: "+ query.toString());
             statement.executeUpdate(query.toString());
         }
-        statement.close();
+        if (type == QueryType.DROP){
+            log.info("Q: "+ query.toString());
+            statement.executeUpdate(query.toString());
         }
+        statement.close();
+    }
+
     public ResultSet ExecuteElection() throws SQLException {
         if (where != null)
             query.append(where);
@@ -212,8 +218,23 @@ public class QueryMaster {
             delete.Execute();
             return true;
         } catch (SQLException ex) {
-            log.severe("Selecting from " + tableName + " ERR: " + ex + "\n" + ex.getStackTrace());
+            log.severe("ERR: Selecting from " + tableName + " ERR: " + ex + "\n" + ex.getStackTrace());
             return false;
         }
+    }
+
+    static public boolean Drop(String table){
+        try{
+            QueryMaster drop = new QueryMaster(QueryType.DROP, table);
+            drop.Execute();
+            return true;
+        } catch (SQLException ex) {
+            log.severe("ERR: dropping table " + table + " caused an error: "+ex+"\""+ ex.getStackTrace());
+            return false;
+        }
+    }
+
+    static public void DeactivateConnection() {
+        try {connection.close(); } catch (Exception ex) {log.warning(ex+"\n"+ex.getStackTrace());}
     }
 }

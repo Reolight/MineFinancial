@@ -1,5 +1,11 @@
 package reolina.MineFinancial.AControl;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import reolina.MineFinancial.QueryMasterConstructor.Field;
 import reolina.MineFinancial.QueryMasterConstructor.QueryMaster;
 import reolina.MineFinancial.QueryMasterConstructor.SQLtype;
@@ -8,11 +14,14 @@ import reolina.MineFinancial.definition.FRole;
 import reolina.MineFinancial.definition.Type;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class APlayer extends account implements IBalance{
     static public Map<String, APlayer> list = new HashMap<>();
@@ -20,6 +29,7 @@ public class APlayer extends account implements IBalance{
     static private final String[] columnNames = {"nickname", "balance", "frole", "clan"};
     static Logger log = Logger.getLogger("Minecraft");
     protected String MemberOfClan;
+    protected ArrayList<ItemStack> playerMail = new ArrayList<>();
 
     public String Name;
     Type OwnerType = Type.player;
@@ -62,7 +72,7 @@ public class APlayer extends account implements IBalance{
     @Override public int AddBalance(BigDecimal delta) {
         return ChangeBalance(delta);
     }
-
+    @Override public BigDecimal getBalance() { return balance; }
     ///Changing FRore
     static private FRole[] fr = FRole.values();
     static private void UpdateFRole(String playerName, FRole newfr){
@@ -134,5 +144,32 @@ public class APlayer extends account implements IBalance{
         this.balance = balance;
         this.frole = frole;
         MemberOfClan = clanMember;
+    }
+
+    public void getItems(ItemStack[] receivingItma) {
+
+        for (ItemStack itma : receivingItma){
+            if (itma == null) continue;
+            else playerMail.add(itma);
+        }
+    }
+
+    public void mailShow(Player player){
+        Inventory mail = Bukkit.createInventory(player, 27, "Почта");
+        mail.setContents(playerMail.toArray(ItemStack[]::new));
+        player.openInventory(mail);
+    }
+
+    public void catchObject(ItemStack itemGot){
+        playerMail.add(itemGot);
+        String rem = ChatColor.GREEN+ "Вы приобрели предмет "+ChatColor.DARK_GREEN+
+                itemGot.getItemMeta().getDisplayName()+ChatColor.GREEN+". Заберите его на почте";
+        new AReminder(this.getName(), this.getName(), rem, false, null);
+    }
+
+    public void onInventoryClose(InventoryCloseEvent event){
+        playerMail = Arrays.stream(event.getView().getTopInventory().getContents())
+                .filter(itemStack -> (itemStack != null))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 }

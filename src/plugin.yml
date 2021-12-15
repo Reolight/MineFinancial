@@ -1,6 +1,7 @@
 name: MineFinancial
 main: reolina.MineFinancial.main.MineFinancial
 version: 0.1.0
+api-version: 1.17
 authors: [Reolight, Eva]
 commands:
   bank:
@@ -46,3 +47,16 @@ commands:
       /<command> [#toClan|@toPlayer|$toBank] amount - pay to instance
       /<command> [@RelevantClan] [#toClan|@toPlayer|$toBank] amount - pay from clan to instance
     aliases: [transaction]
+  market:
+    description: market menu
+    usage:
+      /<command> - show GUI
+      /<command> sell - sell item
+    aliases: [рынок]
+  credit:
+    description: allows player borrow money and be a creditor
+    usage:
+      /<command> create (amount) (rate?) (days?) - создаёт кредит на сумму amount ставкой rate на дней days
+      /<command> create asClan (amount) (rate?) (days?) - создаёт кредит от имени клана на сумму amount ставкой rate на дней days
+      /<command> take (ID) (amount?) - взять кредит ID на сумму amount
+      /<command> pay (ID) (amount) - оплатить кредит

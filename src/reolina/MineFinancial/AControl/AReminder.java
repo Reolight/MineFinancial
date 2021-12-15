@@ -36,7 +36,7 @@ public class AReminder {
             switch (aReminder.ERAction) {
                 case ClanInvitation:
                     if (reply) {
-                        AClan.clans.get(aReminder.sender).AddMember(aReminder.getter);
+                        AClan.clans.get(AClan.SearchPlayer(aReminder.sender)).AddMember(aReminder.getter);
                     } else Bukkit.getPlayer(AClan.clans.get(aReminder.sender).clanLeader)
                             .sendMessage(ChatColor.AQUA+ aReminder.getter+ChatColor.BLUE+" отклонил предложение о вступлении в клан");
                     break;
@@ -64,10 +64,8 @@ public class AReminder {
     static void Send(AReminder remToSend){
         var pl = Bukkit.getPlayer(remToSend.getter);
         pl.sendMessage((remToSend.ERAction == null ? "" : ChatColor.ITALIC+""+ChatColor.GRAY + remToSend.id+": " +ChatColor.RESET) + remToSend.reminder
-                +(remToSend.isApproval ? ChatColor.ITALIC+""+ChatColor.GRAY + " (/rem ID [y|n})" : ""));
+                +(remToSend.isApproval ? ChatColor.ITALIC+""+ChatColor.GRAY + " (/rem ID [y|n})" : "")); //
         if (!(remToSend.isApproval) & remToSend.isInDatabase) {
-            log.info("deleting reminder: !remToSend.isApproval is "+!(remToSend.isApproval)+" remToSend.isInDatabase is "+ remToSend.isInDatabase+" and in toto: "
-                +(!(remToSend.isApproval) && remToSend.isInDatabase));
             QueryMaster.Delete(table, new rec(columnNames[0], Integer.toString(remToSend.id)));
             remList.remove(remToSend);
         }
@@ -130,7 +128,7 @@ public class AReminder {
     public AReminder(String getter, String sender, String remind, boolean isApproval, ERemindersAction eraction) {
         Optional<AReminder> opt = remList.stream().filter(aReminder -> (aReminder.getter == getter))
                 .filter(aReminder -> aReminder.sender == sender && aReminder.reminder == remind)
-                .findFirst();
+                .findFirst(); //поиск дубляжа
         if (opt.isEmpty()) { //защита от дублирования уже созданных запросов
             this.sender = sender;
             if (eraction != null)
@@ -146,7 +144,7 @@ public class AReminder {
             id = ++lastID;
             remList.add(this); //добавляем в список напоминалок
         } else isInDatabase = opt.get().isInDatabase;
-        if (Bukkit.getPlayer(this.getter).isOnline()) {
+        if (Bukkit.getPlayer(this.getter) != null && Bukkit.getPlayer(this.getter).isOnline()) {
             AReminder.Send(opt.isPresent() ? opt.get() : this);
         } else if (!isInDatabase) {
             QueryMaster.Insert(table, new rec[]
