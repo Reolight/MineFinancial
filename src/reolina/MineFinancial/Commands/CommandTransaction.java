@@ -1,10 +1,11 @@
-package reolina.MineFinancial.main;
+package reolina.MineFinancial.Commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import reolina.MineFinancial.AControl.*;
+import reolina.MineFinancial.main.MineFinancial;
 
 import java.math.BigDecimal;
 import java.util.Locale;

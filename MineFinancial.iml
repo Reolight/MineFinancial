@@ -30,8 +30,6 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="craftbukkit-1.18" level="project" />
-    <orderEntry type="library" name="craftbukkit-1.18  (2)" level="project" />
-    <orderEntry type="library" name="craftbukkit-1.18 (2)" level="project" />
     <orderEntry type="library" name="craftbukkit-1.17.1" level="project" />
   </component>
 </module>

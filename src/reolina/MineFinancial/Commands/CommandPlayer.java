@@ -1,4 +1,4 @@
-package reolina.MineFinancial.main;
+package reolina.MineFinancial.Commands;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -7,6 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.libs.jline.internal.Log;
 import org.bukkit.entity.Player;
 import reolina.MineFinancial.AControl.APlayer;
+import reolina.MineFinancial.main.MineFinancial;
 
 public class CommandPlayer implements CommandExecutor {
 

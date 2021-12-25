@@ -1,4 +1,4 @@
-package reolina.MineFinancial.main;
+package reolina.MineFinancial.Commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -6,6 +6,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.libs.jline.internal.Log;
 import reolina.MineFinancial.AControl.AReminder;
+import reolina.MineFinancial.main.MineFinancial;
 
 public class CommandReminder implements CommandExecutor {
 

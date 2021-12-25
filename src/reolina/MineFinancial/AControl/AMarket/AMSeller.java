@@ -1,4 +1,4 @@
-package reolina.MineFinancial.AControl;
+package reolina.MineFinancial.AControl.AMarket;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -10,8 +10,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import reolina.MineFinancial.definition.AProduct;
-import reolina.MineFinancial.definition.ASellController;
+import reolina.MineFinancial.AControl.APlayer;
 
 import java.math.BigDecimal;
 import java.util.logging.Logger;

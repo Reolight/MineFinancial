@@ -1,4 +1,4 @@
-package reolina.MineFinancial.main;
+package reolina.MineFinancial.Commands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -11,6 +11,7 @@ import reolina.MineFinancial.AControl.AReminder;
 import reolina.MineFinancial.definition.CRole;
 import reolina.MineFinancial.definition.ERemindersAction;
 import reolina.MineFinancial.definition.FRole;
+import reolina.MineFinancial.main.MineFinancial;
 
 import java.util.ArrayList;
 

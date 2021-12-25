@@ -4,9 +4,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import reolina.MineFinancial.AControl.ABank;
-import reolina.MineFinancial.AControl.AClan;
 import reolina.MineFinancial.AControl.AControl;
 import reolina.MineFinancial.AControl.AReminder;
+import reolina.MineFinancial.Commands.*;
+import reolina.MineFinancial.Events.InventoryEvents;
+import reolina.MineFinancial.Events.PlayerLogEvents;
 import reolina.MineFinancial.QueryMasterConstructor.QueryMaster;
 
 import java.util.logging.Logger;

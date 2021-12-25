@@ -1,10 +1,6 @@
 package reolina.MineFinancial.AControl;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import reolina.MineFinancial.main.MineFinancial;
-
-import java.util.Map;
-import java.util.logging.Logger;
+import reolina.MineFinancial.AControl.AMarket.AMSeller;
+import reolina.MineFinancial.AControl.AMarket.AMarket;
 
 public class AControl {
 //будет заниматься инициализацией и управлением всех объектов

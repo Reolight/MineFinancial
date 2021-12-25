@@ -1,13 +1,13 @@
-package reolina.MineFinancial.main;
+package reolina.MineFinancial.Events;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.*;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 import reolina.MineFinancial.AControl.*;
+import reolina.MineFinancial.AControl.AMarket.AMarket;
+import reolina.MineFinancial.main.MineFinancial;
 
 import java.math.BigDecimal;
 import java.util.logging.Logger;

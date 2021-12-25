@@ -1,4 +1,4 @@
-package reolina.MineFinancial.AControl;
+package reolina.MineFinancial.AControl.AMarket;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -7,10 +7,11 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import reolina.MineFinancial.AControl.APlayer;
+import reolina.MineFinancial.AControl.ATransaction;
+import reolina.MineFinancial.AControl.IBalance;
 import reolina.MineFinancial.QueryMasterConstructor.*;
-import reolina.MineFinancial.definition.AProduct;
 
-import java.nio.Buffer;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;

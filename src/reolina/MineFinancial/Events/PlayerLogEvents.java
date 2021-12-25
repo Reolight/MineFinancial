@@ -1,4 +1,4 @@
-package reolina.MineFinancial.main;
+package reolina.MineFinancial.Events;
 
 
 import org.bukkit.Bukkit;
@@ -11,6 +11,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import reolina.MineFinancial.AControl.AClan;
 import reolina.MineFinancial.AControl.APlayer;
 import reolina.MineFinancial.AControl.AReminder;
+import reolina.MineFinancial.main.MineFinancial;
 
 import java.util.logging.Logger;
 

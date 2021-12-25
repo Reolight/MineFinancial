@@ -1,4 +1,4 @@
-package reolina.MineFinancial.main;
+package reolina.MineFinancial.Events;
 
 import org.bukkit.event.Listener;
 

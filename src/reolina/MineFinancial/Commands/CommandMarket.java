@@ -1,12 +1,12 @@
-package reolina.MineFinancial.main;
+package reolina.MineFinancial.Commands;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import reolina.MineFinancial.AControl.AMSeller;
-import reolina.MineFinancial.AControl.AMarket;
+import reolina.MineFinancial.AControl.AMarket.AMSeller;
+import reolina.MineFinancial.AControl.AMarket.AMarket;
+import reolina.MineFinancial.main.MineFinancial;
 
 public class CommandMarket implements CommandExecutor {
     MineFinancial plugin;

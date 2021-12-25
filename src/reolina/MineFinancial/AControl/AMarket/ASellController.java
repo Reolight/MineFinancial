@@ -1,4 +1,4 @@
-package reolina.MineFinancial.definition;
+package reolina.MineFinancial.AControl.AMarket;
 
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
@@ -7,6 +7,7 @@ import reolina.MineFinancial.AControl.ABank;
 import reolina.MineFinancial.AControl.AClan;
 import reolina.MineFinancial.AControl.APlayer;
 import reolina.MineFinancial.AControl.IBalance;
+import reolina.MineFinancial.definition.Type;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

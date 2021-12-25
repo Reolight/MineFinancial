@@ -1,4 +1,4 @@
-package reolina.MineFinancial.main;
+package reolina.MineFinancial.Commands;
 
 import net.minecraft.server.commands.CommandList;
 import org.bukkit.Bukkit;
@@ -12,6 +12,7 @@ import org.bukkit.inventory.Inventory;
 import reolina.MineFinancial.AControl.ABank;
 import reolina.MineFinancial.AControl.APlayer;
 import reolina.MineFinancial.definition.FRole;
+import reolina.MineFinancial.main.MineFinancial;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
